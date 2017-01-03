@@ -31,7 +31,7 @@ static char	*gnl_strncat(const char *s1, const char *s2, int l, char n)
   int		j;
   int		ln;
   char		*res;
-
+  
   if ((ln = gnl_strlen(s1, '\0') + gnl_strlen(s2, '\0')) > l && l >= 0)
     ln = l;
   if (ln == 0 && n)
@@ -51,60 +51,6 @@ static char	*gnl_strncat(const char *s1, const char *s2, int l, char n)
   return (res);
 }
 
-char	is_line(const char *str)
-{
-  int	i;
-
-  i = -1;
-  while (str && str[++i])
-    {
-      if (str[i] == '\n')
-	return (1);
-    }
-  return (0);
-}
-
-/*
-**	anciene version
-** char		*get_next_line(const int fd)
-** {
-**   char		eof;
-**   int		rd;
-**   int		len;
-**   char		*tmp;
-**   char		*line;
-**   static char	*save = NULL;
-**   char		buff[READ_SIZE + 1];
-**
-**   eof = 0;
-**   while (1)
-**     {
-**       if ((len = gnl_strlen(save, '\n')) < gnl_strlen(save, '\0') || eof == 1)
-** 	{
-**
-** 	  line = gnl_strncat(NULL, save, len, eof);
-** 	  tmp = save;
-** 	  save = (save && save[len] ? gnl_strncat(NULL, &save[len + 1], -1, 0) : NULL);
-** 	  free(tmp);
-** 	  return (line);
-** 	}
-**       else
-** 	{
-** 	  if ((rd = read(fd, buff, READ_SIZE)) < 0)
-** 	    return (NULL);
-** 	  else if (rd == 0)
-** 	    eof = 1;
-** 	  else
-** 	    {
-** 	      buff[rd] = '\0';
-** 	      tmp = save;
-** 	      save = gnl_strncat(save, buff, -1, 0);
-** 	      free(tmp);
-** 	    }
-** 	}
-**     }
-** }
-*/
 char		*get_next_line(const int fd)
 {
   int		ln[3];
@@ -132,25 +78,4 @@ char		*get_next_line(const int fd)
   save = (save && save[ln[0]] ? gnl_strncat(NULL, &save[ln[0] + 1], -1, 0) : NULL);
   free(line[1]);
   return (line[0]);
-}
-int	main(int ac, char **av)
-{
-  int	fd;
-  char	*line;
-
-  if (ac != 2)
-    return (0);
-  fd = open(av[1], O_RDONLY);
-  while (line = get_next_line(fd))
-    {
-      printf("line : %s\n", line);
-      free(line);
-    }
-  line = get_next_line(fd);
-  printf("lineN : %s\n", line);
-  line = get_next_line(fd);
-  printf("lineN : %s\n", line);
-  line = get_next_line(fd);
-  printf("lineN : %s\n", line);
-  return (0);
 }
