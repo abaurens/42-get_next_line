@@ -1,16 +1,19 @@
 /*
-** get_next_line.h for gnl in /home/bauren_a/Work/tek-1/CPE/get_next_line
+** get_next_line.h for gnl in /home/baurens/Work/Tek1/Projects/CPE/CPE_2016_getnextline/
 **
-** Made by Arthur
-** Login   <bauren_a@epitech.net>
+** Made by Arthur Baurens
+** Login   <arthur.baurens@epitech.eu>
 **
-** Started on  Tue Jan 12 15:04:37 2016 Arthur
-** Last update Tue Jan 12 18:09:24 2016 Arthur
+** Started on  Mon Jan  2 10:15:26 2017 Arthur Baurens
+** Last update Mon Jan  2 18:28:16 2017 Arthur Baurens
 */
 
-#ifndef READ_SIZE
-# define READ_SIZE (1024)
+#ifndef GET_NEXT_LINE_H_
 
-char	*get_next_line(const int fd);
+#endif /* !GET_NEXT_LINE_H_ */
+
+#ifndef READ_SIZE
+
+# define READ_SIZE 5
 
 #endif /* !READ_SIZE */

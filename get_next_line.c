@@ -1,97 +1,156 @@
 /*
-** get_next_line.c for gnl in /home/bauren_a/Work/tek-1/CPE/get_next_line
+** get_next_line.c for gnl in /home/baurens/Work/Tek1/Projects/CPE/CPE_2016_getnextline/
 **
-** Made by Arthur
-** Login   <bauren_a@epitech.net>
+** Made by Arthur Baurens
+** Login   <arthur.baurens@epitech.eu>
 **
-** Started on  Tue Jan 12 15:12:31 2016 Arthur
-** Last update Mon Feb 15 14:27:21 2016 Arthur
+** Started on  Mon Jan  2 10:17:21 2017 Arthur Baurens
+** Last update Tue Jan  3 14:48:18 2017 Arthur Baurens
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include "get_next_line.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
-int     sl(char *str, char c)
+#include "get_next_line.h"
+#include <unistd.h>
+#include <stdlib.h>
+
+static int	gnl_strlen(const char *str, char c)
 {
-  int   i;
+  int		i;
 
   i = -1;
-  if (str == NULL)
-    return (0);
-  while (str[++i])
-    if (str[i] == c)
-      return (i);
-  return (c == '\0' ? i : -1);
+  while (str != NULL && str[++i] && str[i] != c);
+  return ((str != NULL) * i);
 }
 
-char    *mstc(char *str1, char *str2, int n)
+static char	*gnl_strncat(const char *s1, const char *s2, int l, char n)
+{
+  int		i;
+  int		j;
+  int		ln;
+  char		*res;
+
+  if ((ln = gnl_strlen(s1, '\0') + gnl_strlen(s2, '\0')) > l && l >= 0)
+    ln = l;
+  if (ln == 0 && n)
+    return (NULL);
+  if ((res = malloc(sizeof(char) * (ln + 1))) == NULL)
+    return (NULL);
+  res[ln] = '\0';
+  i = 0;
+  while (s1 && i < ln && s1[i])
+    {
+      res[i] = s1[i];
+      i++;
+    }
+  j = -1;
+  while (s2 && s2[++j] && i + j < ln)
+    res[i + j] = s2[j];
+  return (res);
+}
+
+char	is_line(const char *str)
 {
   int	i;
-  int	j;
-  int	s;
-  int	len;
-  int	len2;
-  char	*ret;
 
-  len = sl(str1, '\0');
-  len2 = sl(str2, '\0');
-  s = len + len2;
-  if (n < size && n != -1)
-    size = n;
-  if (str2 == NULL || (ret = malloc(sizeof(char) * (size + 1))) == NULL)
-    return (NULL);
-  i = 0;
-  while (str1 != NULL && str1[i] && (n == -1 ? (1 == 1) : (i < n)))
-    ret[i] = str1[i++];
-  j = 0;
-  while (str2[j] && (n == -1 ? (1 == 1) : (i < n)))
-    ret[i++] = str2[j++];
-  ret[i] = 0;
-  return (ret);
+  i = -1;
+  while (str && str[++i])
+    {
+      if (str[i] == '\n')
+	return (1);
+    }
+  return (0);
 }
 
-void	*fan(void *ptr)
-{
-  free(ptr);
-  return (NULL);
-}
-
-char	*rl(char *sv, char *buff, int s)
-{
-  char	*tmp;
-
-  buffer[s] = 0;
-  tmp = sv;
-  sv = mstc(sv, buffer, -1);
-  free(tmp);
-  return (sv);
-}
-
+/*
+**	anciene version
+** char		*get_next_line(const int fd)
+** {
+**   char		eof;
+**   int		rd;
+**   int		len;
+**   char		*tmp;
+**   char		*line;
+**   static char	*save = NULL;
+**   char		buff[READ_SIZE + 1];
+**
+**   eof = 0;
+**   while (1)
+**     {
+**       if ((len = gnl_strlen(save, '\n')) < gnl_strlen(save, '\0') || eof == 1)
+** 	{
+**
+** 	  line = gnl_strncat(NULL, save, len, eof);
+** 	  tmp = save;
+** 	  save = (save && save[len] ? gnl_strncat(NULL, &save[len + 1], -1, 0) : NULL);
+** 	  free(tmp);
+** 	  return (line);
+** 	}
+**       else
+** 	{
+** 	  if ((rd = read(fd, buff, READ_SIZE)) < 0)
+** 	    return (NULL);
+** 	  else if (rd == 0)
+** 	    eof = 1;
+** 	  else
+** 	    {
+** 	      buff[rd] = '\0';
+** 	      tmp = save;
+** 	      save = gnl_strncat(save, buff, -1, 0);
+** 	      free(tmp);
+** 	    }
+** 	}
+**     }
+** }
+*/
 char		*get_next_line(const int fd)
 {
-  static char	*sv = NULL;
-  char		*tmp;
-  char		*line;
-  int		l;
-  int		s;
-  char		buffer[READ_SIZE + 1];
+  int		ln[3];
+  char		*line[2];
+  static char	*save = NULL;
+  char		buff[READ_SIZE + 1];
 
-  s = 0;
-  l = sl(sv, '\n');
-  while (l <= 0 && (s = read(fd, buffer, READ_SIZE)) > 0)
-    sv = rl(sv, buffer, s);
-  if (s < 0)
-    return (NULL);
-  if (sl(sv, '\0') == 0 && s == 0)
-    return (line = fan(sv));
-  else if (sv != NULL && sl(sv, '\0') != 0)
+  ln[2] = 0;
+  while ((ln[0] = gnl_strlen(save, '\n')) == gnl_strlen(save, '\0') && !ln[2])
     {
-      line = mstc(NULL, save, ((l == -1) ? l : l++));
-      tmp = save;
-      save = mstc(NULL, ((l == -1) ? NULL : &save[l]), -1);
-      free(tmp);
+      if ((ln[1] = read(fd, buff, READ_SIZE)) < 0)
+	return (NULL);
+      else if (ln[1] == 0)
+	ln[2] = 1;
+      else
+	{
+	  buff[ln[1]] = '\0';
+	  line[1] = save;
+	  save = gnl_strncat(save, buff, -1, 0);
+	  free(line[1]);
+	}
     }
-  return (line);
+  line[0] = gnl_strncat(NULL, save, ln[0], ln[2]);
+  line[1] = save;
+  save = (save && save[ln[0]] ? gnl_strncat(NULL, &save[ln[0] + 1], -1, 0) : NULL);
+  free(line[1]);
+  return (line[0]);
+}
+int	main(int ac, char **av)
+{
+  int	fd;
+  char	*line;
+
+  if (ac != 2)
+    return (0);
+  fd = open(av[1], O_RDONLY);
+  while (line = get_next_line(fd))
+    {
+      printf("line : %s\n", line);
+      free(line);
+    }
+  line = get_next_line(fd);
+  printf("lineN : %s\n", line);
+  line = get_next_line(fd);
+  printf("lineN : %s\n", line);
+  line = get_next_line(fd);
+  printf("lineN : %s\n", line);
+  return (0);
 }
