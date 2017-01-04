@@ -5,11 +5,18 @@
 ** Login   <arthur.baurens@epitech.eu>
 **
 ** Started on  Mon Jan  2 10:15:26 2017 Arthur Baurens
-** Last update Wed Jan  4 07:36:23 2017 John Doe
+** Last update Wed Jan  4 07:39:07 2017 John Doe
 */
 
 #ifndef GET_NEXT_LINE_H_
 # define GET_NEXT_LINE_H_
+
+typedef struct	s_gnl
+{
+  int		fd;
+  char		*sv;
+  struct s_gnl	*next;
+}		t_gnl;
 
 char	*get_next_line(const int);
 
