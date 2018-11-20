@@ -1,20 +1,27 @@
-/*
-** get_next_line.h for gnl in /home/baurens/Work/Tek1/Projects/CPE/CPE_2016_getnextline/
-**
-** Made by Arthur Baurens
-** Login   <arthur.baurens@epitech.eu>
-**
-** Started on  Mon Jan  2 10:15:26 2017 Arthur Baurens
-** Last update Wed Jan  4 07:36:23 2017 John Doe
-*/
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abaurens <abaurens@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/20 14:36:18 by abaurens          #+#    #+#             */
+/*   Updated: 2018/11/20 14:36:54 by abaurens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H_
-# define GET_NEXT_LINE_H_
+#ifndef GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-char	*get_next_line(const int);
+# define BUFF_SIZE 1024
 
-#endif /* !GET_NEXT_LINE_H_ */
+typedef struct		s_gnl
+{
+	char			*bf;
+	int				fd;
+	struct s_gnl	*next;
+}					t_gnl;
 
-#ifndef READ_SIZE
-# define READ_SIZE (5)
-#endif /* !READ_SIZE */
+int					get_next_line(const int fd, char **line);
+
+#endif

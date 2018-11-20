@@ -1,81 +1,115 @@
-/*
-** get_next_line.c for gnl in /home/baurens/Work/Tek1/Projects/CPE/CPE_2016_getnextline/
-**
-** Made by Arthur Baurens
-** Login   <arthur.baurens@epitech.eu>
-**
-** Started on  Mon Jan  2 10:17:21 2017 Arthur Baurens
-** Last update Sun Jan 15 17:27:53 2017 John Doe
-*/
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abaurens <abaurens@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2018/11/19 16:56:42 by abaurens          #+#    #+#             */
+/*   Updated: 2018/11/20 14:35:20 by abaurens         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "get_next_line.h"
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-static int	gnl_strlen(const char *str, char c)
+static int			ft_idxof(const char *str, char c)
 {
-  int		i;
+	int				i;
 
-  i = -1;
-  while (str != NULL && str[++i] && str[i] != c);
-  return ((str != NULL) * i);
+	i = 0;
+	while (str && str[i] && str[i] != c)
+		i++;
+	return (i);
 }
 
-static char	*gnl_strncat(const char *s1, const char *s2, int l, char n)
+static char			*ft_gnlcat(const char *s1, const char *s2, int n)
 {
-  int		i;
-  int		j;
-  int		ln;
-  char		*res;
+	int				i;
+	int				len;
+	char			*res;
 
-  if ((ln = gnl_strlen(s1, '\0') + gnl_strlen(s2, '\0')) > l && l >= 0)
-    ln = l;
-  if (ln == 0 && n)
-    return (NULL);
-  if ((res = malloc(sizeof(char) * (ln + 1))) == NULL)
-    return (NULL);
-  res[ln] = '\0';
-  i = 0;
-  while (s1 && i < ln && s1[i])
-    {
-      res[i] = s1[i];
-      i++;
-    }
-  j = -1;
-  while (s2 && s2[++j] && i + j < ln)
-    res[i + j] = s2[j];
-  return (res);
+	i = 0;
+	if ((len = ft_idxof(s1, 0) + ft_idxof(s2, 0)) > n && n >= 0)
+		len = n;
+	if (!(res = malloc(sizeof(char) * (len + 1))))
+		return (NULL);
+	res[len] = 0;
+	while (s1 && *s1 && i < len)
+		res[i++] = *s1++;
+	while (s2 && *s2 && i < len)
+		res[i++] = *s2++;
+	return (res);
 }
 
-char		*get_next_line(const int fd)
+static int			ft_fd_line(const int fd, char **line, char **save)
 {
-  int		ln;
-  char		eof;
-  char		*line;
-  char		*tmp;
-  char		buff[READ_SIZE + 1];
-  static char	*sv = NULL;
+	char			buff[BUFF_SIZE + 1];
+	char			*tmp;
+	int				l;
+	int				n;
 
-  eof = 0;
-  while ((ln = gnl_strlen(sv, '\n')) == gnl_strlen(sv, '\0') && !eof)
-    {
-      if ((ln = read(fd, buff, READ_SIZE)) < 0)
-	return (NULL);
-      else if (ln == 0)
-	eof = 1;
-      else
+	while ((l = ft_idxof(*save, '\n')) == ft_idxof(*save, 0))
 	{
-	  buff[ln] = '\0';
-	  sv = gnl_strncat(tmp = sv, buff, -1, 0);
-	  free(tmp);
+		if ((n = read(fd, buff, BUFF_SIZE)) < 0)
+			return (-1);
+		if (n == 0)
+			break ;
+		buff[n] = 0;
+		if (!(tmp = ft_gnlcat(*save, buff, -1)))
+			return (-1);
+		free(*save);
+		*save = tmp;
 	}
-    }
-  line = gnl_strncat(NULL, tmp = sv, ln, eof);
-  sv = (sv && sv[ln] ? gnl_strncat(NULL, &sv[ln + 1], -1, 0) : NULL);
-  free(tmp);
-  return (line);
+	tmp = *save;
+	if (tmp && !(*line = ft_gnlcat(NULL, tmp, l)))
+		return (-1);
+	l += (tmp && tmp[l] == '\n' ? 1 : 0);
+	*save = ((tmp && tmp[l]) ? ft_gnlcat(0x0, tmp + l, -1) : 0x0);
+	l = (tmp != NULL || n > 0);
+	free(tmp);
+	return (l);
+}
+
+static void			ft_gnl_del(t_gnl **lst, t_gnl *to_rm)
+{
+	t_gnl			*cur;
+
+	if (*lst == to_rm)
+		*lst = (*lst)->next;
+	else
+	{
+		cur = *lst;
+		while (cur && cur->next && cur->next != to_rm)
+			cur = cur->next;
+		if (cur->next == to_rm)
+		{
+			cur->next = to_rm->next;
+			free(to_rm);
+		}
+	}
+}
+
+int					get_next_line(const int fd, char **line)
+{
+	static t_gnl	*lst = NULL;
+	t_gnl			*cur;
+	int				ret;
+
+	cur = lst;
+	while (cur && cur->fd != fd)
+		cur = cur->next;
+	if (!cur)
+	{
+		if (!(cur = malloc(sizeof(t_gnl))))
+			return (-1);
+		cur->fd = fd;
+		cur->sv = NULL;
+		cur->next = lst;
+		lst = cur;
+	}
+	if ((ret = ft_fd_line(cur->fd, line, &cur->sv)) == 0)
+		ft_gnl_del(&lst, cur);
+	return (ret);
 }
