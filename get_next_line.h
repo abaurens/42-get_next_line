@@ -6,7 +6,7 @@
 /*   By: abaurens <abaurens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/20 14:36:18 by abaurens          #+#    #+#             */
-/*   Updated: 2018/11/20 14:36:54 by abaurens         ###   ########.fr       */
+/*   Updated: 2018/11/20 14:42:39 by abaurens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 
 typedef struct		s_gnl
 {
-	char			*bf;
+	char			*sv;
 	int				fd;
 	struct s_gnl	*next;
 }					t_gnl;
