@@ -6,7 +6,7 @@
 /*   By: abaurens <abaurens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:56:42 by abaurens          #+#    #+#             */
-/*   Updated: 2018/11/20 14:35:20 by abaurens         ###   ########.fr       */
+/*   Updated: 2018/11/23 02:12:24 by abaurens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,10 @@ static int			ft_fd_line(const int fd, char **line, char **save)
 	tmp = *save;
 	if (tmp && !(*line = ft_gnlcat(NULL, tmp, l)))
 		return (-1);
-	l += (tmp && tmp[l] == '\n' ? 1 : 0);
+	n = (tmp && tmp[l] == '\n' && ++l);
 	*save = ((tmp && tmp[l]) ? ft_gnlcat(0x0, tmp + l, -1) : 0x0);
-	l = (tmp != NULL || n > 0);
 	free(tmp);
-	return (l);
+	return (n || *save != NULL);
 }
 
 static void			ft_gnl_del(t_gnl **lst, t_gnl *to_rm)
