@@ -6,7 +6,7 @@
 /*   By: abaurens <abaurens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/19 16:56:42 by abaurens          #+#    #+#             */
-/*   Updated: 2018/11/23 02:12:24 by abaurens         ###   ########.fr       */
+/*   Updated: 2018/11/23 02:17:33 by abaurens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,18 +76,16 @@ static void			ft_gnl_del(t_gnl **lst, t_gnl *to_rm)
 	t_gnl			*cur;
 
 	if (*lst == to_rm)
-		*lst = (*lst)->next;
+		*lst = to_rm->next;
 	else
 	{
 		cur = *lst;
 		while (cur && cur->next && cur->next != to_rm)
 			cur = cur->next;
-		if (cur->next == to_rm)
-		{
+		if (cur && cur->next == to_rm)
 			cur->next = to_rm->next;
-			free(to_rm);
-		}
 	}
+	free(to_rm);
 }
 
 int					get_next_line(const int fd, char **line)
